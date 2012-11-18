@@ -141,7 +141,6 @@ inline game_session_pool::~game_session_pool()
 
 inline void game_session_pool::add_game_session(game_participant_ptr player1, game_participant_ptr player2)
 {
-    std::cerr << "game_session_pool::add_game_session" << std::endl;
     game_session_ptr new_session(new game_session(player1, player2));
     io_service_m.post(std::bind(&game_session::start, new_session));
 }

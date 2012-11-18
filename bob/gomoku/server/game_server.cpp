@@ -34,13 +34,10 @@ void game_server::handle_accept
         game_participant_queue_m.push(player);
         if (game_participant_queue_m.size() >= 2)
         {
-            std::cerr << game_participant_queue_m.size() << std::endl;
             game_participant_ptr player1 = game_participant_queue_m.front();
             game_participant_queue_m.pop();
-            std::cerr << game_participant_queue_m.size() << std::endl;
             game_participant_ptr player2 = game_participant_queue_m.front();
             game_participant_queue_m.pop();
-            std::cerr << game_participant_queue_m.size() << std::endl;
 
             session_pool_m.add_game_session(player1, player2);
         }
