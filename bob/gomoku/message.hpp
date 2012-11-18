@@ -1,6 +1,8 @@
 #ifndef BOB_GOMOKU_MESSAGE_HPP
 #define BOB_GOMOKU_MESSAGE_HPP
 
+#include <bob/gomoku/game/board.hpp>
+
 #include <string>
 #include <sstream>
 
@@ -8,7 +10,7 @@ namespace bob { namespace gomoku
 {
 
 typedef std::string message_authentication;
-typedef move_type   message_move;
+typedef bob::gomoku::game::move_type message_move;
 
 namespace client_message
 {
@@ -43,9 +45,9 @@ namespace client_message
         std::istringstream in(m);
 
         message_move result(0, 0);
-        in >> m.x >> m.y;
+        in >> result.x >> result.y;
 
-        error = in.fail()
+        error = in.fail();
         return result;
     }
 

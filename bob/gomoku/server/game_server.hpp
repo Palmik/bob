@@ -47,3 +47,4 @@ inline void game_server::start()
 } // namespace bob
 
 #endif // BOB_GOMOKU_SERVER_SERVER_HPP
+

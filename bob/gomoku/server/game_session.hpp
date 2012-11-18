@@ -1,14 +1,17 @@
 #ifndef BOB_GOMOKU_SERVER_GAME_SESSION_HPP
 #define BOB_GOMOKU_SERVER_GAME_SESSION_HPP
 
-#include <bob/gomoku/game/board.hpp>
-#include <bob/gomoku/server/game_participant.hpp>
-#include <bob/gomoku/server/game_message.hpp>
+#include "../game/board.hpp"
+#include "../message.hpp"
+#include "game_participant.hpp"
 
 #include <string>
 #include <queue>
+#include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/thread/thread.hpp>
+
+typedef unsigned int uint;
 
 namespace bob { namespace gomoku { namespace server
 {
@@ -24,11 +27,9 @@ public:
     void start();
 
 private:
-    void start_game(uint curr, uint next, bob::gomoku::game::board& board);
+    uint start_game(uint curr, uint next, bob::gomoku::game::board& board);
 
     game_participant_ptr players_m[2];
-
-    bob::gomoku::game::board board_m;
 };
 
 typedef std::shared_ptr<game_session> game_session_ptr;
@@ -37,7 +38,7 @@ inline game_session::game_session
     ( game_participant_ptr player1
     , game_participant_ptr player2
     )
-    , players_m{player1, player2}
+    : players_m{player1, player2}
 {
 }
 
@@ -49,7 +50,7 @@ inline void game_session::start()
     std::srand(std::time(0));
     if (std::rand() % 2)
     {
-        swap(curr, next);
+        std::swap(curr, next);
     }
     
     std::string message;
@@ -63,21 +64,25 @@ inline void game_session::start()
         start_game(curr, next, board);
     }
     
-    swap(curr, next);
-    start_game(curr, next);
-
+    std::swap(curr, next);
+    
+    {
+        bob::gomoku::game::board board(100, 100);
+        start_game(curr, next, board);
+    }
 }
 
-void uint game_session::start_game(uint curr, uint next, bob::gomoku::game::board& board)
+inline uint game_session::start_game(uint curr, uint next, bob::gomoku::game::board& board)
 {
     // Sending the board settings.
-    players_m[0]->send_message("100 100");
-    players_m[1]->send_message("100 100");
+    std::string message = std::to_string(board.rows()) + " " + std::to_string(board.columns()) + '\n';
+    
+    players_m[0]->send_message(message);
+    players_m[1]->send_message(message);
 
     players_m[curr]->send_message("start\n");
    
     bool error = false;
-    std::string message;
     while (true)
     {
         message = players_m[curr]->read_message();
@@ -85,22 +90,22 @@ void uint game_session::start_game(uint curr, uint next, bob::gomoku::game::boar
         
         if (error)
         {
-            players_m[curr]->send_message("over d invalid_input: \"" + message + "\"");
-            players_m[next]->send_message("over w invalid_input: \"" + message + "\"");
+            players_m[curr]->send_message("over d invalid_input: \"" + message + "\"\n");
+            players_m[next]->send_message("over w invalid_input: \"" + message + "\"\n");
             return next;
         }
 
-        player_m[next]->send_message(bob::gomoku::client_message::make_move(move));
+        players_m[next]->send_message(bob::gomoku::client_message::make_move(move));
         board.play(move);
 
         if (board.over())
         {
-            players_m[curr]->send_message("over w");
-            players_m[next]->send_message("over d");
+            players_m[curr]->send_message("over w\n");
+            players_m[next]->send_message("over d\n");
             return curr;
         }
         
-        swap(curr, next);
+        std::swap(curr, next);
     }
 }
 

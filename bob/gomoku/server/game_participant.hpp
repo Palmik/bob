@@ -1,8 +1,6 @@
 #ifndef BOB_GOMOKU_SERVER_GAME_PARTICIPANT_HPP
 #define BOB_GOMOKU_SERVER_GAME_PARTICIPANT_HPP
 
-#include "game_message.hpp"
-
 #include <string>
 #include <queue>
 #include <memory>
@@ -21,8 +19,8 @@ public:
 
     boost::asio::ip::tcp::socket& socket();
 
-    game_message read_message(bool& error);
-    void         send_message(game_message const& m);
+    std::string read_message();
+    void        send_message(std::string const& m);
 
 private:
     boost::asio::io_service& io_service_m;
@@ -49,7 +47,7 @@ inline boost::asio::ip::tcp::socket& game_participant::socket()
     return socket_m;
 }
 
-inline game_message game_participant::read_message(bool& error)
+inline std::string game_participant::read_message()
 {
     boost::asio::read_until(socket_m, message_buffer_m, delimiter_m);
 
@@ -57,15 +55,15 @@ inline game_message game_participant::read_message(bool& error)
     std::string message_raw;
     std::getline(is, message_raw, delimiter_m);
 
-    return parse_message(message_raw, error);
+    return message_raw;
 }
 
-inline void game_participant::send_message(game_message const& m)
+inline void game_participant::send_message(std::string const& m)
 {
-    std::ostringstream out;
-    out << m.x << ' ' << m.y << '\n'; 
-
-    boost::asio::write(socket_m, boost::asio::buffer(out.str().data(), out.str().size()));
+    boost::asio::write
+        ( socket_m
+        , boost::asio::buffer(m.data(), m.size())
+        );
 }
 
 } // namespace server
