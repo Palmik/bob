@@ -1,0 +1,11 @@
+def build(bld) :
+    bld( features = 'cxx cxxstlib'
+       , target = 'bob/gomoku/game'
+       , source = 'board.cpp'
+       , includes = '../../../'
+       , export_includes = '../../../'
+       , use = []
+       , lib = []
+       )
+       
+    bld.recurse('tests')

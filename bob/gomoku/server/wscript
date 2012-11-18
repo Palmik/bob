@@ -1,0 +1,8 @@
+def build(bld) :
+    bld( features = 'cxx cxxprogram'
+       , target = 'bob_gomoku_server'
+       , source = 'game_server.cpp main.cpp'
+       , includes = '../../..'
+       , use = ['bob/gomoku/game']
+       , lib = ['boost_system', 'boost_thread', 'pthread']
+       )

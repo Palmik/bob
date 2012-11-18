@@ -1,0 +1,8 @@
+def build(bld) :
+    bld( features = 'cxx cxxprogram'
+       , source = 'client.cpp main.cpp'
+       , target = 'bob_client'
+       , includes = '../../'
+       , lib = ['boost_system', 'boost_thread', 'pthread']
+       )
+

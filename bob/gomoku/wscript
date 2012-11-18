@@ -1,0 +1,4 @@
+def build(bld) :
+    bld.recurse('game')
+    bld.recurse('client')
+    bld.recurse('server')

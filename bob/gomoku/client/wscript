@@ -1,0 +1,7 @@
+def build(bld) :
+    bld( features = 'cxx cxxshlib'
+       , target   = 'bob/gomoku/client/message'
+       , includes = '../../../'
+       , export_includes = '../../../'
+       )
+
