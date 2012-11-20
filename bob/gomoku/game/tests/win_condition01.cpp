@@ -4,12 +4,13 @@
 #include <boost/test/unit_test.hpp>
 
 #include <bob/gomoku/game/board.hpp>
+#include <bob/gomoku/game/replay.hpp>
 
 using namespace bob::gomoku::game;
 
 BOOST_AUTO_TEST_CASE(unit01)
 {
-    board b01(10, 10, player_type::black);
+    board b01(board_settings(10, 10, player_type::black));
     b01.play(move_type(3, 3));
     b01.play(move_type(4, 3));
     b01.play(move_type(2, 4));
@@ -20,9 +21,11 @@ BOOST_AUTO_TEST_CASE(unit01)
     b01.play(move_type(6, 1));
     b01.play(move_type(6, 0));
 
+    std::cout << replay_json(b01.settings(), b01.history().begin(), b01.history().end(), "aaa", "bbb") << std::endl; 
+    
     BOOST_CHECK(b01.over());
     
-    board b02(10, 10, player_type::white);
+    board b02(board_settings(10, 10, player_type::white));
     b02.play(move_type(3, 3));
     b02.play(move_type(4, 3));
     b02.play(move_type(2, 4));

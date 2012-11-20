@@ -2,14 +2,9 @@
 #ifndef BOB_GOMOKU_GAME_BOARD_IMP_HPP
 #define BOB_GOMOKU_GAME_BOARD_IMP_HPP
 
-inline board::size_type board::columns() const
+inline board_settings board::settings() const
 {
-    return columns_m;
-}
-
-inline board::size_type board::rows() const
-{
-    return rows_m;
+    return settings_m;
 }
 
 inline std::list<move_type> const& board::history() const
@@ -17,14 +12,9 @@ inline std::list<move_type> const& board::history() const
     return history_m;
 }
 
-inline player_type board::first_player() const
-{
-    return first_player_m;
-}
-
 inline square_type board::square_at(size_type x, size_type y) const
 {
-    if (x >= columns() || y >= rows())
+    if (x >= settings().columns() || y >= settings().rows())
     {
         return square_type::empty;
     }
@@ -46,7 +36,7 @@ inline bool board::over() const
 
 inline board::size_type board::to_index(size_type x, size_type y) const
 {
-    return x + y * columns();
+    return x + y * settings().columns();
 }
 
 inline square_type player_to_square(player_type p)

@@ -17,10 +17,14 @@ public:
         , std::function<void(boost::system::error_code)> const& error_callback
         );
 
+    ~game_participant();
+
     boost::asio::ip::tcp::socket& socket();
 
-    std::string read_message();
-    void        send_message(std::string const& m);
+    std::string const& name() const;
+
+    std::string read_message(bool& error);
+    void        send_message(std::string const& m, bool& error);
 
 private:
     boost::asio::io_service& io_service_m;
@@ -42,14 +46,28 @@ inline game_participant::game_participant
 {
 }
 
+inline game_participant::~game_participant()
+{
+    socket_m.close();
+}
+
 inline boost::asio::ip::tcp::socket& game_participant::socket()
 {
     return socket_m;
 }
 
-inline std::string game_participant::read_message()
+inline std::string game_participant::read_message(bool& error)
 {
-    boost::asio::read_until(socket_m, message_buffer_m, delimiter_m);
+    error = false;
+    try
+    {
+        boost::asio::read_until(socket_m, message_buffer_m, delimiter_m);
+    }
+    catch(...)
+    {
+        error = true;
+        socket_m.close();
+    }
 
     std::istream is(&message_buffer_m);
     std::string message_raw;
@@ -58,12 +76,21 @@ inline std::string game_participant::read_message()
     return message_raw;
 }
 
-inline void game_participant::send_message(std::string const& m)
+inline void game_participant::send_message(std::string const& m, bool& error)
 {
-    boost::asio::write
-        ( socket_m
-        , boost::asio::buffer(m.data(), m.size())
-        );
+    error = false;
+    try
+    {
+        boost::asio::write
+            ( socket_m
+            , boost::asio::buffer(m.data(), m.size())
+            );
+    }
+    catch(...)
+    {
+        error = true;
+        socket_m.close();
+    }
 }
 
 } // namespace server

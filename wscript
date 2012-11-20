@@ -6,12 +6,15 @@ def options(opt) :
 
 def configure(cnf) :
     cnf.load('compiler_cxx boost waf_unit_test')
-    cnf.check_cxx(cxxflags = ['-std=c++11', '-ggdb3'])
-    cnf.env.append_value('CXXFLAGS', ['-std=c++11', '-ggdb3'])
+    
+    flags = ['-static', '-Wl,-Bstatic', '-Wall', '-Wextra', '-std=c++0x', '-ggdb3']
+    cnf.check_cxx(cxxflags = flags)
+    cnf.env.append_value('CXXFLAGS', flags)
 
 def build(bld) :
     bld.add_post_fun(waf_unit_test.summary)
 
+    bld.recurse('bob/database')
     bld.recurse('bob/client')
     bld.recurse('bob/gomoku')
 

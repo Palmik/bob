@@ -1,9 +1,10 @@
-#include "game.hpp"
-using namespace gomoku;
+#include "game/board.hpp"
+#include "game/replay.hpp"
+using namespace bob::gomoku::game;
 
 int main()
 {
-    board b(10, 10, player_type::black);
+    board b(board_settings(10, 10, player_type::black));
     b.play(move_type(3, 3));
     b.play(move_type(4, 3));
     b.play(move_type(2, 4));
@@ -13,6 +14,7 @@ int main()
     b.play(move_type(4, 2));
     b.play(move_type(6, 1));
     b.play(move_type(6, 0));
+
+    std::cout << replay_json(b.settings(), b.history().begin(), b.history().end(), "aaa", "bbb") << std::endl; 
     
-    std::cout << b;
 }

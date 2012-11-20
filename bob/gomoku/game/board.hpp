@@ -31,20 +31,38 @@ public:
     std::size_t y;
 };
 
+struct board_settings
+{
+public:
+    board_settings(std::size_t columns, std::size_t rows, player_type first_player)
+        : columns_m(columns)
+        , rows_m(rows)
+        , first_player_m(first_player)
+    {
+    }
+
+    std::size_t columns() const { return columns_m; }
+    std::size_t rows() const { return rows_m; }
+    player_type first_player() const { return first_player_m; } 
+
+private:
+    std::size_t columns_m;
+    std::size_t rows_m;
+    player_type first_player_m;
+};
+
 class board
 {
 public:
     typedef std::size_t size_type;
     
-    board(size_type columns, size_type rows, player_type first_player = player_type::white);
+    board(board_settings const& s);
 
-    size_type columns() const;
-    size_type rows() const;
+    board_settings settings() const;
 
     square_type square_at(size_type x, size_type y) const;
 
     player_type current_player() const;
-    player_type first_player() const;
 
     bool play(move_type const& m);
     bool over() const;
@@ -54,12 +72,10 @@ public:
 private:
     void check_over(move_type const& m);
     size_type to_index(size_type x, size_type y) const;
-    
-    size_type columns_m;
-    size_type rows_m;
+   
+    board_settings settings_m;
 
-          player_type current_player_m;
-    const player_type first_player_m;
+    player_type current_player_m;
 
     bool over_m;
 

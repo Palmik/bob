@@ -12,6 +12,7 @@ game_server::game_server
     , acceptor_m(io_service, endpoint)
     , error_callback_m(error_callback)
     , session_pool_m(4)
+    , connection_m("database.sqlite")
 {
 }
 
@@ -39,7 +40,7 @@ void game_server::handle_accept
             game_participant_ptr player2 = game_participant_queue_m.front();
             game_participant_queue_m.pop();
 
-            session_pool_m.add_game_session(player1, player2);
+            session_pool_m.add_game_session(player1, player2, connection_m);
         }
 
         do_start_accept();

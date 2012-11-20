@@ -1,6 +1,7 @@
 #ifndef BOB_GOMOKU_SERVER_SERVER_HPP
 #define BOB_GOMOKU_SERVER_SERVER_HPP
 
+#include <bob/database/database.hpp>
 #include "game_participant.hpp"
 #include "game_session.hpp"
 
@@ -35,6 +36,8 @@ private:
     std::queue<game_participant_ptr> game_participant_queue_m;
 
     game_session_pool session_pool_m;
+
+    bob::database::connection connection_m;
 };
 
 inline void game_server::start()
