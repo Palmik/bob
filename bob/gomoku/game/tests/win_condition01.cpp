@@ -37,5 +37,18 @@ BOOST_AUTO_TEST_CASE(unit01)
     b02.play(move_type(6, 0));
 
     BOOST_CHECK(b02.over());
+    
+    board b03(board_settings(10, 10, player_type::white));
+    b03.play(move_type(0, 1));
+    b03.play(move_type(3, 2));
+    b03.play(move_type(0, 2));
+    b03.play(move_type(5, 2));
+    b03.play(move_type(0, 3));
+    b03.play(move_type(7, 2));
+    b03.play(move_type(0, 4));
+    b03.play(move_type(5, 5));
+    b03.play(move_type(0, 0));
+    
+    BOOST_CHECK(b03.over());
 }
 
