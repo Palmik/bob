@@ -41,6 +41,7 @@ public:
     {
     }
 
+
     std::size_t columns() const { return columns_m; }
     std::size_t rows() const { return rows_m; }
     player_type first_player() const { return first_player_m; } 
@@ -59,6 +60,8 @@ public:
     board(board_settings const& s);
 
     board_settings settings() const;
+    
+    void clear(board_settings const& s);
 
     square_type square_at(size_type x, size_type y) const;
 

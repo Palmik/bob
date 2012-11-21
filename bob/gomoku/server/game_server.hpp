@@ -33,7 +33,7 @@ private:
     boost::asio::io_service& io_service_m;
     boost::asio::ip::tcp::acceptor acceptor_m;
     std::function<void(boost::system::error_code)> error_callback_m;
-    std::queue<game_participant_ptr> game_participant_queue_m;
+    std::list<game_participant_ptr> game_participant_queue_m;
 
     game_session_pool session_pool_m;
 

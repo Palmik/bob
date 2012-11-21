@@ -12,23 +12,16 @@ namespace bob { namespace gomoku { namespace server
 class game_participant
 {
 public:
-    game_participant
-        ( boost::asio::io_service& io_service
-        , std::function<void(boost::system::error_code)> const& error_callback
-        );
-
+    game_participant(boost::shared_ptr<boost::asio::ip::tcp::socket> socket);
     ~game_participant();
 
-    boost::asio::ip::tcp::socket& socket();
+    bool is_open() const;
 
-    std::string const& name() const;
-
-    std::string read_message(bool& error);
-    void        send_message(std::string const& m, bool& error);
+    std::string read_message();
+    void        send_message(std::string const& m);
 
 private:
-    boost::asio::io_service& io_service_m;
-    boost::asio::ip::tcp::socket socket_m;
+    boost::shared_ptr<boost::asio::ip::tcp::socket> socket_m;
 
     boost::asio::streambuf message_buffer_m;
 
@@ -37,36 +30,31 @@ private:
 
 typedef std::shared_ptr<game_participant> game_participant_ptr;
 
-inline game_participant::game_participant
-    ( boost::asio::io_service& io_service
-    , std::function<void(boost::system::error_code)> const& error_callback
-    )
-    : io_service_m(io_service)
-    , socket_m(io_service)
+inline game_participant::game_participant(boost::shared_ptr<boost::asio::ip::tcp::socket> socket)
+    : socket_m(socket)
 {
 }
 
 inline game_participant::~game_participant()
 {
-    socket_m.close();
+    socket_m->close();
 }
 
-inline boost::asio::ip::tcp::socket& game_participant::socket()
+inline bool game_participant::is_open() const
 {
-    return socket_m;
+    return socket_m->is_open();
 }
 
-inline std::string game_participant::read_message(bool& error)
+inline std::string game_participant::read_message()
 {
-    error = false;
     try
     {
-        boost::asio::read_until(socket_m, message_buffer_m, delimiter_m);
+        boost::asio::read_until(*socket_m, message_buffer_m, delimiter_m);
     }
     catch(...)
     {
-        error = true;
-        socket_m.close();
+        socket_m->close();
+        throw;
     }
 
     std::istream is(&message_buffer_m);
@@ -76,20 +64,19 @@ inline std::string game_participant::read_message(bool& error)
     return message_raw;
 }
 
-inline void game_participant::send_message(std::string const& m, bool& error)
+inline void game_participant::send_message(std::string const& m)
 {
-    error = false;
     try
     {
         boost::asio::write
-            ( socket_m
+            ( *socket_m
             , boost::asio::buffer(m.data(), m.size())
             );
     }
     catch(...)
     {
-        error = true;
-        socket_m.close();
+        socket_m->close();
+        throw;
     }
 }
 

@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(unit01)
     b01.play(move_type(6, 1));
     b01.play(move_type(6, 0));
 
-    std::cout << replay_json(b01.settings(), b01.history().begin(), b01.history().end(), "aaa", "bbb") << std::endl; 
+    //std::cout << replay_json(b01, "aaa", "bbb") << std::endl; 
     
     BOOST_CHECK(b01.over());
     

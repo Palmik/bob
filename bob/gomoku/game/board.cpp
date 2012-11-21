@@ -1,5 +1,8 @@
 #include "board.hpp"
 
+#include <iterator>
+#include <algorithm>
+
 namespace bob { namespace gomoku { namespace game
 {
 
@@ -7,9 +10,18 @@ board::board(board_settings const& s)
   : settings_m(s)
   , current_player_m(s.first_player())
   , over_m(false)
-  , squares_m(s.columns() * s.rows())
+  , squares_m(s.columns() * s.rows(), square_type::empty)
 {
-    std::fill(squares_m.begin(), squares_m.end(), square_type::empty); 
+}
+
+void board::clear(board_settings const& s)
+{
+    settings_m = s;
+    current_player_m = s.first_player();
+    over_m = false;
+    squares_m.clear();
+    squares_m.resize(s.columns() * s.rows());
+    history_m.clear();
 }
 
 bool board::play(move_type const& m)
@@ -44,20 +56,11 @@ bool check_neighbourhood(std::vector<square_type> const& n)
           board::size_type got  = 0;
     
     // First iteration.
-    square_type prev = n.front();
-    if (prev != square_type::empty)
-    {
-        ++got;
-    }
+    square_type prev = square_type::empty;
 
     for (square_type const& curr : n)
     {
-        if (got == need)
-        {
-            return true;
-        }
-
-        if (curr == prev)
+        if (curr == prev || prev == square_type::empty)
         {
             if (curr != square_type::empty)
             {
@@ -66,7 +69,19 @@ bool check_neighbourhood(std::vector<square_type> const& n)
         }
         else
         {
-            got = 0;
+            if (curr == square_type::empty)
+            {
+                got = 0;
+            }
+            else
+            {
+                got = 1;
+            }
+        }
+        
+        if (got == need)
+        {
+            return true;
         }
 
         prev = curr;
@@ -96,6 +111,9 @@ void board::check_over(move_type const& m)
         if (check_neighbourhood(neighbourhood))
         {
             over_m = true;
+            std::cerr << '-';
+            std::copy(neighbourhood.begin(), neighbourhood.end(), std::ostream_iterator<square_type>(std::cerr, ""));
+            std::cerr << " over" << std::endl;
             return;
         }
     }
@@ -114,6 +132,9 @@ void board::check_over(move_type const& m)
         if (check_neighbourhood(neighbourhood))
         {
             over_m = true;
+            std::cerr << '|';
+            std::copy(neighbourhood.begin(), neighbourhood.end(), std::ostream_iterator<square_type>(std::cerr, ""));
+            std::cerr << " over" << std::endl;
             return;
         }
     }
@@ -132,6 +153,9 @@ void board::check_over(move_type const& m)
         if (check_neighbourhood(neighbourhood))
         {
             over_m = true;
+            std::cerr << '\\';
+            std::copy(neighbourhood.begin(), neighbourhood.end(), std::ostream_iterator<square_type>(std::cerr, ""));
+            std::cerr << " over" << std::endl;
             return;
         }
     }
@@ -150,9 +174,23 @@ void board::check_over(move_type const& m)
         if (check_neighbourhood(neighbourhood))
         {
             over_m = true;
+            std::cerr << '/';
+            std::copy(neighbourhood.begin(), neighbourhood.end(), std::ostream_iterator<square_type>(std::cerr, ""));
+            std::cerr << " over" << std::endl;
             return;
         }
     }
+}
+
+std::ostream& operator<<(std::ostream& out, square_type s)
+{
+    switch (s)
+    {
+        case square_type::empty: out << "E"; break;
+        case square_type::black: out << "B"; break;
+        case square_type::white: out << "W"; break;
+    }
+    return out;
 }
 
 } // namespace gomoku

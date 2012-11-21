@@ -4,4 +4,5 @@ def build(bld) :
     parent_name = 'bob/gomoku/game'
 
     bld.create_boost_test(uses, libs, parent_name, 'win_condition01')
+    bld.create_boost_test(uses, libs, parent_name, 'win_condition02')
 

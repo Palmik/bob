@@ -12,9 +12,9 @@ def handler_json(request) :
     if (row != None) :
         return json.loads(row[0])
     else :
-        return HTTPNotFound('Such replay does not exist.')
+        return pyramid.httpexceptions.HTTPNotFound('Such replay does not exist.')
 
 def handler(request) :
     rid = request.matchdict['rid']
-    
+
     return {"replay_json_url" : request.route_url('replay_json1', rid=rid)}

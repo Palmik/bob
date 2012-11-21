@@ -18,9 +18,10 @@ game_server::game_server
 
 void game_server::do_start_accept()
 {
-    game_participant_ptr new_player(new game_participant(io_service_m, error_callback_m));
+    boost::shared_ptr<boost::asio::ip::tcp::socket> new_socket(new boost::asio::ip::tcp::socket(io_service_m));
+    game_participant_ptr new_player(new game_participant(new_socket));
     acceptor_m.async_accept
-        ( new_player->socket()
+        ( *new_socket
         , std::bind(&game_server::handle_accept, this, new_player, std::placeholders::_1)
         );
 }
@@ -32,13 +33,13 @@ void game_server::handle_accept
 {
     if (!e)
     {
-        game_participant_queue_m.push(player);
+        game_participant_queue_m.push_back(player);
         if (game_participant_queue_m.size() >= 2)
         {
             game_participant_ptr player1 = game_participant_queue_m.front();
-            game_participant_queue_m.pop();
+            game_participant_queue_m.pop_front();
             game_participant_ptr player2 = game_participant_queue_m.front();
-            game_participant_queue_m.pop();
+            game_participant_queue_m.pop_front();
 
             session_pool_m.add_game_session(player1, player2, connection_m);
         }

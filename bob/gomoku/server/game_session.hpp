@@ -22,170 +22,208 @@ class game_session
 {
 public:
     game_session
-        ( game_participant_ptr player1
-        , game_participant_ptr player2
+        ( game_participant_ptr player_white
+        , game_participant_ptr player_black
         , bob::database::connection& connection
         );
 
     void start();
 
 private:
-    void start_game(uint curr, uint next);
+    void start_game();
+    void report_draw(std::string const& info, bool replay = true);
+    void report_over
+        ( game_participant_ptr player_w
+        , game_participant_ptr player_l
+        , std::string const& info
+        , bool replay = true
+        );
 
-    game_participant_ptr players_m[2];
-    std::string          players_name_m[2];
+    uint save_replay();
 
-    bob::database::connection& connection_m;
+    game_participant_ptr player_white_m;
+    game_participant_ptr player_black_m;
+
+    std::string player_white_name_m;
+    std::string player_black_name_m;
+
+    bob::gomoku::game::board_settings board_settings_m;
+    bob::gomoku::game::board board_m;
+
+    bob::database::connection& connection_db_m;
 };
 
 typedef std::shared_ptr<game_session> game_session_ptr;
 
 inline game_session::game_session
-    ( game_participant_ptr player1
-    , game_participant_ptr player2
+    ( game_participant_ptr player_white
+    , game_participant_ptr player_black
     , bob::database::connection& connection
     )
-    : players_m{player1, player2}
-    , connection_m(connection)
+    : player_white_m(player_white)
+    , player_black_m(player_black)
+    , player_white_name_m("<unknown>")
+    , player_black_name_m("<unknown>")
+    , board_settings_m(50, 50, bob::gomoku::game::player_type::white)
+    , board_m(board_settings_m)
+    , connection_db_m(connection)
 {
 }
 
 inline void game_session::start()
 {
     using namespace bob::gomoku;
-    uint white_i = 0;
-    uint black_i = 1;
 
     std::srand(std::time(0));
     if (std::rand() % 2)
     {
-        std::swap(white_i, black_i);
+        std::swap(player_white_m, player_black_m);
     }
 
-    bool error = false;
-    players_name_m[0] = players_m[0]->read_message(error);
-    if (error) { return; }
-    players_name_m[1] = players_m[1]->read_message(error);
-    if (error) { return; }
+    try
+    {
+        player_white_name_m = player_white_m->read_message();
+        player_black_name_m = player_black_m->read_message();
+    }
+    catch(...)
+    {
+        report_draw("oponnent_disconnect");
+    }
+
+    try
+    { 
+        std::cerr << "aa: " << board_m.over() << std::endl;
+        start_game();
     
-    start_game(white_i, black_i);
-    std::swap(white_i, black_i);
-    start_game(white_i, black_i);
-    std::swap(white_i, black_i);
-    start_game(white_i, black_i);
+        std::swap(player_white_m, player_black_m);
+        std::swap(player_white_name_m, player_black_name_m);
+        board_m.clear(board_settings_m);
+        
+
+        std::cerr << "aa: " << board_m.over() << std::endl;
+        start_game();
+    
+        std::swap(player_white_m, player_black_m);
+        std::swap(player_white_name_m, player_black_name_m);
+        board_m.clear(board_settings_m);
+        
+        std::cerr << "aa: " << board_m.over() << std::endl;
+        start_game();
+
+        std::swap(player_white_m, player_black_m);
+        std::swap(player_white_name_m, player_black_name_m);
+        board_m.clear(board_settings_m);
+    }
+    catch(...)
+    {
+        report_draw("oponnent_disconnect");
+    }
 }
 
-inline void game_session::start_game(const uint white_i, const uint black_i)
+
+inline void game_session::start_game()
 {
-    game::board board(game::board_settings(50, 50, game::player_type::white));
+    std::string message = std::to_string(board_m.settings().rows()) + " " +
+                          std::to_string(board_m.settings().columns()) + '\n';
 
     // Sending the board settings.
-    std::string message = std::to_string(board.settings().rows()) + " " +
-                          std::to_string(board.settings().columns()) + '\n';
-   
-    bool error  = false;
+    player_white_m->send_message(message);
+    player_black_m->send_message(message);
+
+    // Sending the start signal.
+    player_white_m->send_message("start\n");
+    
     bool error_parse = false;
-    bool over = false;
-
-    uint player_w = 0;
-    uint player_l = 0;
-    std::string over_message;
     
-    for (uint i = 0; i < 2; ++i)
-    {
-        players_m[i]->send_message(message, error);
-        
-        // The player disconnected or some otehr exception occured.
-        if (!players_m[i]->socket().is_open() || error)
-        {
-            over_message = "disconnect";
-            player_w = (i == 1) ? 0 : 1;
-            player_l = i;
-            over = true;
-        }
-    }
-
-    players_m[white_i]->send_message("start\n", error);
-    
-    // The player disconnected or some otehr exception occured.
-    if (!players_m[white_i]->socket().is_open() || error)
-    {
-        over_message = "disconnect";
-        player_w = black_i;
-        player_l = white_i;
-        over = true;
-    }
-    
-    uint curr = white_i;
-    uint next = black_i;
-    while (!over)
+    game_participant_ptr curr = player_white_m;
+    game_participant_ptr next = player_black_m;
+    while (true)
     { 
-        error = false;
         error_parse = false; 
         
-        message = players_m[curr]->read_message(error);
-        
-        // The player disconnected or some other exception occured.
-        if (!players_m[curr]->socket().is_open() || error)
-        {
-            over_message = "disconnect";
-            player_w = next;
-            player_l = curr;
-            break;            
-        }
-
+        message = curr->read_message();
         bob::gomoku::message_move move = bob::gomoku::client_message::parse_move(message, error_parse);
         
         // The message was in wrong format.
         if (error_parse)
         {
-            over_message = "invalid_input: \"" + message + "\"";
-            player_w = next;
-            player_l = curr;
+            report_over(next, curr, "invalid_input: \"" + message + "\"");
             break;
         }
 
-        players_m[next]->send_message(bob::gomoku::client_message::make_move(move), error);
-        
-        // The player disconnected or some other exception occured.
-        if (!players_m[next]->socket().is_open() || error)
-        {
-            over_message = "disconnect";
-            player_w = curr;
-            player_l = next;
-            break;            
-        }
-        
         // The move was invalid.
-        if (!board.play(move))
+        if (!board_m.play(move))
         {
-            over_message = "invalid_move: \"" + message + "\"";
-            player_w = next;
-            player_l = curr;
+            report_over(next, curr, "invalid_move: \"" + message + "\"");
             break;
         }
 
-        if (board.over())
+        // The move was winning.
+        if (board_m.over())
         {
-            player_w = curr;
-            player_l = next;
+            report_over(curr, next, "last_move: \"" + message + "\"");
             break;
         }
+        
+        // Send the move to the opponent.
+        next->send_message(bob::gomoku::client_message::make_move(move));
         
         std::swap(curr, next);
     }
+}
 
+inline void game_session::report_draw(std::string const& info, bool replay)
+{
+    std::string replay_info;
+    if (replay)
+    {
+        replay_info = "; replay_id: " + std::to_string(save_replay());
+    }
+    
+    try
+    {
+        player_white_m->send_message("over d; " + info + replay_info + "\n");
+        player_black_m->send_message("over d; " + info + replay_info + "\n");
+    }
+    catch(...)
+    {
+    }
+}
+
+inline void game_session::report_over
+    ( game_participant_ptr player_w
+    , game_participant_ptr player_l
+    , std::string const& info
+    , bool replay
+    )
+{
+    std::string replay_info;
+    if (replay)
+    {
+        replay_info = "; replay_id: " + std::to_string(save_replay());
+    }
+    
+    try
+    {
+        player_l->send_message("over l; " + info + replay_info + "\n");
+        player_w->send_message("over w; " + info + replay_info + "\n");
+    }
+    catch(...)
+    {
+    }
+}
+
+inline uint game_session::save_replay()
+{
     uint replay_id = 0;
     try
     {
-        replay_id = connection_m.insert_replay
+        replay_id = connection_db_m.insert_replay
                         ( bob::database::gomoku_id
                         , bob::gomoku::game::replay_json
-                            ( board.settings()
-                            , board.history().begin()
-                            , board.history().end()
-                            , players_name_m[white_i]
-                            , players_name_m[black_i]
+                            ( board_m
+                            , player_white_name_m
+                            , player_black_name_m
                             )
                         );
     }
@@ -194,15 +232,7 @@ inline void game_session::start_game(const uint white_i, const uint black_i)
         std::cerr << e.what() << std::endl;
     }
 
-    for (uint i = 0; i < 2; ++i)
-    {
-        std::string res = (i == player_w) ? "w" : "l";
-
-        if (players_m[i]->socket().is_open())
-        {
-            players_m[i]->send_message("over " + res + "; " + over_message + "; replay_id: " + std::to_string(replay_id) + "\n", error);
-        }
-    }
+    return replay_id;
 }
 
 class game_session_pool
@@ -212,8 +242,8 @@ public:
     ~game_session_pool();
     
     void add_game_session
-        ( game_participant_ptr player1
-        , game_participant_ptr player2
+        ( game_participant_ptr player_white
+        , game_participant_ptr player_black
         , bob::database::connection& connection
         );
 
@@ -240,12 +270,12 @@ inline game_session_pool::~game_session_pool()
 }
 
 inline void game_session_pool::add_game_session
-    ( game_participant_ptr player1
-    , game_participant_ptr player2
+    ( game_participant_ptr player_white
+    , game_participant_ptr player_black
     , bob::database::connection& connection
     )
 {
-    game_session_ptr new_session(new game_session(player1, player2, connection));
+    game_session_ptr new_session(new game_session(player_white, player_black, connection));
     io_service_m.post(std::bind(&game_session::start, new_session));
 }
 
