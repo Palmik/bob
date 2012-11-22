@@ -8,7 +8,7 @@ namespace bob { namespace gomoku { namespace game
 
 board::board(board_settings const& s)
   : settings_m(s)
-  , current_player_m(s.first_player())
+  , current_player_m(player_type::black)
   , over_m(false)
   , squares_m(s.columns() * s.rows(), square_type::empty)
 {
@@ -17,10 +17,9 @@ board::board(board_settings const& s)
 void board::clear(board_settings const& s)
 {
     settings_m = s;
-    current_player_m = s.first_player();
+    current_player_m = player_type::black;
     over_m = false;
-    squares_m.clear();
-    squares_m.resize(s.columns() * s.rows());
+    squares_m.assign(s.columns() * s.rows(), square_type::empty);
     history_m.clear();
 }
 

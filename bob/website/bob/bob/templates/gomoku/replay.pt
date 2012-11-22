@@ -1,4 +1,4 @@
-<metal:main use-macro="load: default.pt">
+<metal:main use-macro="load: ../default.pt">
     <tal:block metal:fill-slot="content_title">
         Gomoku Replay :: Rossum's Battle of Bits
     </tal:block>
@@ -13,18 +13,22 @@
     <tal:block metal:fill-slot="content_body">
         <div class="container-fluid">
           <div class="row-fluid">
-            <div class="span2 well">
+            <div class="span3">
+              <div data-spy="affix" data-offset-top="0" class="well">
+              <div class="input-append">
+                  <input name="game-turn-input" id="game-turn-input" type="text">
+                  <span class="add-on" id="game-turn-display-maximum"></span>
+              </div>
               <div class="btn-group">
                 <button class="btn" id="game-button-previous"><i class="icon-arrow-left"></i></button>
                 <button class="btn" data-toggle="button" id="game-button-play-pause"><i id="game-icon-play-pause" class="icon-play"></i></button>
                 <button class="btn" id="game-button-next"><i class="icon-arrow-right"></i></button>
               </div>
-              <span id="game-current-turn"></span>/<span id="game-maximum-turn"></span>
-              <div id="game-slider"></div>
-          </div>
+              </div>
+            </div>
 
-            <div class="span10">
-                <div><strong id="player-white"></strong> vs. <strong id="player-black"></strong></div>
+            <div class="span9">
+                <div><strong id="player-black">${player_black_name}</strong> vs. <strong id="player-white">${player_white_name}</strong></div>
                 <canvas id="game-canvas" width="800" height="800"></canvas>
             </div>
           </div>

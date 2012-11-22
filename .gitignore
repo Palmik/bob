@@ -1,0 +1,4 @@
+build
+bob/website/env
+*.swp
+*~

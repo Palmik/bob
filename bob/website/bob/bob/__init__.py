@@ -20,13 +20,11 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.add_static_view('static', 'static', cache_max_age=3600)
     # ROUTES
-    config.add_route('replay_json1', '/replay/{rid}.json')
-    config.add_route('replay', '/replay/{rid}')
-    config.add_route('replay_json2', '/replay/{rid}', accept="application/json")
+    config.add_route('gomoku_replay_json', '/g/gomoku/replay/{rid}.json')
+    config.add_route('gomoku_replay', '/g/gomoku/replay/{rid}')
     # VIEWS
-    config.add_view(bob.handlers.replay.handler_json, route_name='replay_json1', renderer='json')
-    config.add_view(bob.handlers.replay.handler_json, route_name='replay_json2', renderer='json')
-    config.add_view(bob.handlers.replay.handler, route_name='replay', renderer='templates/replay.pt') 
+    config.add_view(bob.handlers.replay.gomoku_json, route_name='gomoku_replay_json', renderer='json')
+    config.add_view(bob.handlers.replay.gomoku, route_name='gomoku_replay', renderer='templates/gomoku/replay.pt') 
 
     # EVENT SUBSCRIBERS
     config.add_subscriber(database_connect, NewRequest)

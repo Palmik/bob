@@ -34,22 +34,19 @@ public:
 struct board_settings
 {
 public:
-    board_settings(std::size_t columns, std::size_t rows, player_type first_player)
+    board_settings(std::size_t columns, std::size_t rows)
         : columns_m(columns)
         , rows_m(rows)
-        , first_player_m(first_player)
     {
     }
 
 
     std::size_t columns() const { return columns_m; }
     std::size_t rows() const { return rows_m; }
-    player_type first_player() const { return first_player_m; } 
 
 private:
     std::size_t columns_m;
     std::size_t rows_m;
-    player_type first_player_m;
 };
 
 class board

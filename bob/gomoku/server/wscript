@@ -1,7 +1,7 @@
 def build(bld) :
     bld( features = 'cxx cxxprogram'
        , target = 'bob_gomoku_server'
-       , source = 'game_server.cpp main.cpp'
+       , source = 'game_server.cpp game_session.cpp main.cpp'
        , includes = '../../../'
        , use = ['bob/database', 'bob/gomoku/game']
        , lib = ['sqlite3', 'boost_system', 'boost_thread', 'pthread']
