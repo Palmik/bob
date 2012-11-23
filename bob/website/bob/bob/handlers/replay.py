@@ -3,7 +3,7 @@ import pyramid.httpexceptions
 import sqlite3
 import json
 
-def gomoku_json(request) :
+def connect_json(request) :
     rid = request.matchdict['rid']
 
     replay_data_query = "SELECT data FROM game_session WHERE id = ?"
@@ -15,7 +15,7 @@ def gomoku_json(request) :
     else :
         return pyramid.httpexceptions.HTTPNotFound('Such replay does not exist.')
 
-def gomoku(request) :
+def connect(request) :
     rid = request.matchdict['rid']
     
     player_name_query = """
@@ -33,7 +33,7 @@ def gomoku(request) :
     if (player_black_name_row != None and player_white_name_row != None) :
         return { "player_black_name" : player_black_name_row[0]
                , "player_white_name" : player_white_name_row[0]
-               , "replay_json_url" : request.route_url('gomoku_replay_json', rid=rid)
+               , "replay_json_url" : request.route_url('connect_replay_json', rid=rid)
                }
     else :
         return pyramid.httpexceptions.HTTPNotFound('Such replay does not exist.')

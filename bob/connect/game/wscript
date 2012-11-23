@@ -1,6 +1,6 @@
 def build(bld) :
     bld( features = 'cxx cxxstlib'
-       , target = 'bob/gomoku/game'
+       , target = 'bob/connect/game'
        , source = 'board.cpp'
        , includes = '../../../'
        , export_includes = '../../../'

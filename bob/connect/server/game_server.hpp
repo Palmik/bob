@@ -9,7 +9,7 @@
 #include <queue>
 #include <boost/asio.hpp>
 
-namespace bob { namespace gomoku { namespace server
+namespace bob { namespace connect { namespace server
 {
 
 class game_server
@@ -46,7 +46,7 @@ inline void game_server::start()
 }
 
 } // namespace server
-} // namespace gomoku
+} // namespace connect
 } // namespace bob
 
 #endif // BOB_GOMOKU_SERVER_SERVER_HPP

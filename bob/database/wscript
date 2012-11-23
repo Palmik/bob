@@ -1,0 +1,10 @@
+def build(bld) :
+    bld( features = 'cxx cxxstlib'
+       , target = 'bob/database'
+       , source = 'database.cpp'
+       , includes = '../../'
+       , export_includes = '../../'
+       , use = []
+       , lib = ['sqlite3']
+       )
+       

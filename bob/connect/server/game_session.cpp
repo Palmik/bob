@@ -1,4 +1,4 @@
-#include <bob/gomoku/server/game_session.hpp>
+#include <bob/connect/server/game_session.hpp>
 
 #include <string>
 #include <queue>
@@ -8,14 +8,14 @@
 
 #include <bob/database/database.hpp>
 
-#include <bob/gomoku/message.hpp>
-#include <bob/gomoku/game/board.hpp>
-#include <bob/gomoku/game/replay.hpp>
-#include <bob/gomoku/server/game_participant.hpp>
+#include <bob/connect/message.hpp>
+#include <bob/connect/game/board.hpp>
+#include <bob/connect/game/replay.hpp>
+#include <bob/connect/server/game_participant.hpp>
 
 typedef unsigned int uint;
 
-namespace bob { namespace gomoku { namespace server
+namespace bob { namespace connect { namespace server
 {
 
 game_session::game_session
@@ -33,7 +33,7 @@ game_session::game_session
 
 void game_session::start()
 {
-    using namespace bob::gomoku;
+    using namespace bob::connect;
 
     std::srand(std::time(0));
     if (std::rand() % 2)
@@ -74,9 +74,10 @@ void game_session::start_game()
     while (true)
     { 
         bool error_parse = false;
-        
+    
+        curr->connection->send_message("play\n");    
         message = curr->connection->read_message();
-        bob::gomoku::message_move move = bob::gomoku::client_message::parse_move(message, error_parse);
+        bob::connect::message_move move = bob::connect::client_message::parse_move(message, error_parse);
         
         // The message was in wrong format.
         if (error_parse)
@@ -93,15 +94,19 @@ void game_session::start_game()
         }
 
         // The move was winning.
-        if (board_m.over())
+        if (board_m.is_over())
         {
             report_over(curr, next, "last_move: \"" + message + "\"");
             break;
         }
         
         // Send the move to the opponent.
-        next->connection->send_message(bob::gomoku::client_message::make_move(move));
-        std::swap(curr, next);
+        next->connection->send_message(bob::connect::client_message::make_move(move));
+        
+        if (board_m.is_new_turn())
+        {
+            std::swap(curr, next);
+        }
     }
     
     std::swap(player_white_m, player_black_m);
@@ -168,9 +173,9 @@ uint game_session::save_game_session()
             };
 
         replay_id = connection_db_m.insert_game_session
-                        ( bob::database::game_type::gomoku
+                        ( bob::database::game_type::connect
                         , ps, ps + 2
-                        , bob::gomoku::game::replay_data
+                        , bob::connect::game::replay_data
                             ( board_m
                             )
                         );
@@ -227,6 +232,6 @@ void game_session_pool::add_game_session
 }
 
 } // namespace server
-} // namespace gomoku
+} // namespace connect
 } // namespace bob
 

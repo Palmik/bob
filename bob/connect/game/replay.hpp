@@ -1,9 +1,9 @@
 #ifndef BOB_GOMOKU_GAME_REPLAY_HPP
 #define BOB_GOMOKU_GAME_REPLAY_HPP
 
-#include <bob/gomoku/game/board.hpp>
+#include <bob/connect/game/board.hpp>
 
-namespace bob { namespace gomoku { namespace game 
+namespace bob { namespace connect { namespace game 
 {
 
 inline std::string replay_data(board const& b)
@@ -31,7 +31,7 @@ inline std::string replay_data(board const& b)
 }
 
 } // namespace game
-} // namespace gomoku
+} // namespace connect
 } // namespace bob
 
 #endif // BOB_GOMOKU_GAME_REPLAY_HPP

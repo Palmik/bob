@@ -8,12 +8,12 @@
 
 #include <bob/database/database.hpp>
 
-#include <bob/gomoku/game/board.hpp>
-#include <bob/gomoku/server/game_participant.hpp>
+#include <bob/connect/game/board.hpp>
+#include <bob/connect/server/game_participant.hpp>
 
 typedef unsigned int uint;
 
-namespace bob { namespace gomoku { namespace server
+namespace bob { namespace connect { namespace server
 {
 
 namespace detail
@@ -74,8 +74,8 @@ private:
     detail::game_participant_data player_black_m;
     detail::game_participant_data player_white_m;
 
-    bob::gomoku::game::board_settings board_settings_m;
-    bob::gomoku::game::board board_m;
+    bob::connect::game::board_settings board_settings_m;
+    bob::connect::game::board board_m;
 
     bob::database::connection& connection_db_m;
 };
@@ -101,7 +101,7 @@ private:
 };
 
 } // namespace server
-} // namespace gomoku
+} // namespace connect
 } // namespace bob
 
 #endif // BOB_GOMOKU_SERVER_GAME_SESSION_HPP

@@ -16,7 +16,7 @@ def build(bld) :
 
     bld.recurse('bob/database')
     bld.recurse('bob/client')
-    bld.recurse('bob/gomoku')
+    bld.recurse('bob/connect')
 
 @conf
 def create_boost_test(bld, uses, libs, parent_name, name) :

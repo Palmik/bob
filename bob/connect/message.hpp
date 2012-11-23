@@ -1,16 +1,16 @@
 #ifndef BOB_GOMOKU_MESSAGE_HPP
 #define BOB_GOMOKU_MESSAGE_HPP
 
-#include <bob/gomoku/game/board.hpp>
+#include <bob/connect/game/board.hpp>
 
 #include <string>
 #include <sstream>
 
-namespace bob { namespace gomoku
+namespace bob { namespace connect
 {
 
 typedef std::string message_authentication;
-typedef bob::gomoku::game::move_type message_move;
+typedef bob::connect::game::move_type message_move;
 
 namespace client_message
 {
@@ -53,7 +53,7 @@ namespace client_message
 
 } // namespace client_message
 
-} // namespace gomoku
+} // namespace connect
 } // namespace bob
 
 #endif // BOB_GOMOKU_MESSAGE_HPP

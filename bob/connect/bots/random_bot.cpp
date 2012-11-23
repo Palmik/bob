@@ -48,6 +48,11 @@ inline bool is_start_line(std::string const& line)
     return line == "start";
 }
 
+inline bool is_play_line(std::string const& line)
+{
+    return line == "play";
+}
+
 inline bool is_over_line(std::string const& line)
 {
     char const* over_string = "over";
@@ -75,17 +80,18 @@ inline void play()
     std::string line;
     getline(std::cin, line, '\n');
 
-    if (line == "black")
-    {
-        play_random();
-    }
-
     while (getline(std::cin, line, '\n'))
     {
         if (line == "") { continue; }
         if (is_over_line(line))
         {
             return;
+        }
+
+        if (is_play_line(line))
+        {
+            play_random();
+            continue;
         }
 
         std::istringstream in(line);
@@ -95,8 +101,6 @@ inline void play()
 
         board[x + y * board_w] = true;
         --board_free;
-
-        play_random();
     }
 }
 
@@ -106,7 +110,6 @@ int main()
 
     std::cout << "random_bot\n";
 
-    //std::cerr << is_over_line("over awdwd") << is_over_line("over") << is_over_line("oveaawd") << std::endl;
     play();
     play();
     play();

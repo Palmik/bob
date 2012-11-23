@@ -1,7 +1,7 @@
 def build(bld) :
-    uses = ['bob/gomoku/game']
+    uses = ['bob/connect/game']
     libs = []
-    parent_name = 'bob/gomoku/game'
+    parent_name = 'bob/connect/game'
 
     bld.create_boost_test(uses, libs, parent_name, 'win_condition01')
     bld.create_boost_test(uses, libs, parent_name, 'win_condition02')

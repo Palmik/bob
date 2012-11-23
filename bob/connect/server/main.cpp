@@ -6,11 +6,11 @@
 #include <boost/asio.hpp>
 #include <boost/thread/thread.hpp>
 
-using namespace bob::gomoku::server;
+using namespace bob::connect::server;
 
 inline void do_help()
 {
-    std::cout << "Usage: bob_gomoku_server <port>" << std::endl;
+    std::cout << "Usage: bob_connect_server <port>" << std::endl;
 }
 
 inline void error_callback(boost::system::error_code e)

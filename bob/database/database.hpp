@@ -11,7 +11,7 @@ namespace bob { namespace database
 
 enum class game_type : int
 {
-    gomoku = 1
+    connect = 1
 };
 
 struct game_session_participant_data

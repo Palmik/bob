@@ -1,6 +1,6 @@
 #/bin/bash
 
-RUNB="./bob/gomoku/bots/random_bot"
+RUNB="./bob/connect/bots/random_bot"
 RUNC="./build/bob/client/bob_client $1 $2"
 
 rm     /tmp/fifo{B,C}2 &> /dev/null

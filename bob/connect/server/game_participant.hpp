@@ -6,7 +6,7 @@
 #include <memory>
 #include <boost/asio.hpp>
 
-namespace bob { namespace gomoku { namespace server
+namespace bob { namespace connect { namespace server
 {
 
 class game_participant
@@ -81,7 +81,7 @@ inline void game_participant::send_message(std::string const& m)
 }
 
 } // namespace server
-} // namespace gomoku
+} // namespace connect
 } // namespace bob
 
 #endif // BOB_GOMOKU_SERVER_GAME_PARTICIPANT_HPP

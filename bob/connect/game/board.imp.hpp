@@ -12,7 +12,7 @@ inline std::list<move_type> const& board::history() const
     return history_m;
 }
 
-inline square_type board::square_at(size_type x, size_type y) const
+inline square_type board::square_at(uint x, uint y) const
 {
     if (x >= settings().columns() || y >= settings().rows())
     {
@@ -29,12 +29,12 @@ inline player_type board::current_player() const
     return current_player_m;
 }
 
-inline bool board::over() const 
+inline bool board::is_over() const 
 {
     return over_m;
 }
 
-inline board::size_type board::to_index(size_type x, size_type y) const
+inline uint board::to_index(uint x, uint y) const
 {
     return x + y * settings().columns();
 }

@@ -1,6 +1,6 @@
 #include "game_server.hpp"
 
-namespace bob { namespace gomoku { namespace server
+namespace bob { namespace connect { namespace server
 {
 
 game_server::game_server
@@ -53,5 +53,5 @@ void game_server::handle_accept
 }
 
 } // namespace server
-} // namespace gomoku
+} // namespace connect
 } // namespace bob

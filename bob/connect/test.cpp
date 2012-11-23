@@ -1,6 +1,6 @@
 #include "game/board.hpp"
 #include "game/replay.hpp"
-using namespace bob::gomoku::game;
+using namespace bob::connect::game;
 
 int main()
 {

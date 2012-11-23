@@ -99,7 +99,7 @@ void connection::create_tables()
        "( user_id         INTEGER "
        ", game_session_id INTEGER "
        ", result          INTEGER " // Can differ game from game, but it is usually one of (defeat, draw, victory). 
-       ", type            INTEGER " // Can differ game from game, for gomoku this is either (0 == white) or (1 == black).
+       ", type            INTEGER " // Can differ game from game, for connect this is either (0 == white) or (1 == black).
        ");";
     
     char const* user =
