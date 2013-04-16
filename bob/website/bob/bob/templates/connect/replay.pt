@@ -1,6 +1,6 @@
 <metal:main use-macro="load: ../default.pt">
     <tal:block metal:fill-slot="content_title">
-        Gomoku Replay :: Rossum's Battle of Bits
+        Connect Replay :: Rossum's Battle of Bits
     </tal:block>
 
     <tal:block metal:fill-slot="content_body">

@@ -56,45 +56,38 @@ bool board::is_new_turn() const
            ((m >  moves_init_m) && (((m - moves_init_m) % moves_turn_m) == 0));
 }
 
-bool check_neighbourhood(std::vector<square_type> const& n, uint win_condition)
+bool board::check_over_neighbourhood(move_type const& m, int dx, int dy)
 {
-    //std::copy(n.begin(), n.end(), std::ostream_iterator<square_type>(std::cerr, ""));
-    //std::cerr << std::endl;
-    
-    if (n.empty())
-    {
-        return false;
-    }
+    const uint nsize = 2 * win_condition_m;
+    const int cs = settings_m.columns();
+    const int rs = settings_m.rows();
 
-    uint got  = 0;
+    uint        got  = 0;
     square_type prev = square_type::empty;
 
-    for (square_type const& curr : n)
+    int x = m.x;
+    int y = m.y;
+    for (uint i = 0; i < nsize && x >= 0 && y >= 0 && x < cs && y < rs; ++i)
     {
-        if (curr == prev || prev == square_type::empty)
+        square_type curr = squares_m[to_index(x, y)];
+
+        if (curr != prev)
         {
-            if (curr != square_type::empty)
-            {
-                ++got;
-            }
+            got = 0;
         }
-        else
+
+        if (curr != square_type::empty)
         {
-            if (curr == square_type::empty)
-            {
-                got = 0;
-            }
-            else
-            {
-                got = 1;
-            }
+            ++got;
         }
-        
-        if (got == win_condition)
+
+        if (got == win_condition_m)
         {
             return true;
         }
 
+        x += dx;
+        y += dy;
         prev = curr;
     }
 
@@ -103,22 +96,10 @@ bool check_neighbourhood(std::vector<square_type> const& n, uint win_condition)
 
 void board::check_over(move_type const& m)
 {
-    std::vector<square_type> neighbourhood;
-    neighbourhood.reserve(2 * win_condition_m);
-
     // Horizontal neighbourhood.
     {
-        neighbourhood.clear();
-        int s = uint_sub(m.x, (win_condition_m - 1));
-        int e = std::min(m.x + (win_condition_m - 1), settings().columns() - 1);
-
-        for (int i = s; i <= e; ++i)
-        {
-            neighbourhood.push_back(squares_m[to_index(i, m.y)]);
-        }
-
-        //std::cerr << "n -: ";
-        if (check_neighbourhood(neighbourhood, win_condition_m))
+        move_type start(uint_sub(m.x, win_condition_m - 1), m.y);
+        if (check_over_neighbourhood(start, 1, 0))
         {
             over_m = true;
             return;
@@ -127,17 +108,8 @@ void board::check_over(move_type const& m)
     
     // Vertical neighbourhood.
     {
-        neighbourhood.clear();
-        uint s = uint_sub(m.y, (win_condition_m - 1));
-        uint e = std::min(m.y + (win_condition_m - 1), settings().rows() - 1);
-        
-        for (uint i = s; i <= e; ++i)
-        {
-            neighbourhood.push_back(squares_m[to_index(m.x, i)]);
-        }
-
-        //std::cerr << "n |: ";
-        if (check_neighbourhood(neighbourhood, win_condition_m))
+        move_type start(m.x, uint_sub(m.y, win_condition_m - 1));
+        if (check_over_neighbourhood(start, 0, 1))
         {
             over_m = true;
             return;
@@ -146,17 +118,9 @@ void board::check_over(move_type const& m)
     
     // Diagonal neighbourhood (\). The coordinate (0, 0) is top-left corner.
     {
-        neighbourhood.clear();
-        int ds = -std::min(win_condition_m - 1, std::min(m.x, m.y));
-        int de =  std::min(win_condition_m - 1, std::min(settings().columns() - m.x, settings().rows() - m.y));
-
-        for (int d = ds; d <= de; ++d)
-        {
-            neighbourhood.push_back(squares_m[to_index(m.x + d, m.y + d)]);
-        }
-
-        //std::cerr << "n \\: ";
-        if (check_neighbourhood(neighbourhood, win_condition_m))
+        uint ds = std::min(win_condition_m - 1, std::min(m.x, m.y)); 
+        move_type start(m.x - ds, m.y - ds);
+        if (check_over_neighbourhood(start, 1, 1))
         {
             over_m = true;
             return;
@@ -165,17 +129,9 @@ void board::check_over(move_type const& m)
 
     // Diagonal neighbourhood (/). The coordinate (0, 0) is top-left corner.
     {
-        neighbourhood.clear();
-        int ds = -std::min(win_condition_m - 1, std::min(m.x, settings().rows() - m.y));
-        int de =  std::min(win_condition_m - 1, std::min(settings().columns() - m.x, m.y));
-
-        for (int d = ds; d <= de; ++d)
-        {
-            neighbourhood.push_back(squares_m[to_index(m.x + d, m.y - d)]);
-        }
-
-        //std::cerr << "n /: ";
-        if (check_neighbourhood(neighbourhood, win_condition_m))
+        uint ds = std::min(win_condition_m - 1, std::min(settings().columns() - m.x, m.y)); 
+        move_type start(m.x + ds, m.y - ds);
+        if (check_over_neighbourhood(start, -1, 1))
         {
             over_m = true;
             return;
@@ -204,7 +160,7 @@ std::ostream& operator<<(std::ostream& out, player_type s)
     return out;
 }
 
-
 } // namespace connect
 } // namespace game
 } // namespace bob
+

@@ -1,0 +1,2 @@
+def static(request) :
+    return {}

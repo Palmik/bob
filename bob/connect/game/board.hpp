@@ -68,6 +68,7 @@ public:
 
 private:
     void check_over(move_type const& m);
+    bool check_over_neighbourhood(move_type const& m, int dx, int dy);
     uint to_index(uint x, uint y) const;
 
     board_settings settings_m;

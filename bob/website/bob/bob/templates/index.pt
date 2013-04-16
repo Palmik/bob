@@ -1,0 +1,48 @@
+<metal:main use-macro="load: default.pt">
+    <tal:block metal:fill-slot="content_title">
+        Rossum's Battle of Bits -- &alpha;
+    </tal:block>   
+
+    <tal:block metal:fill-slot="menu_items">
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Games <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li><a href="#">Connect</a></li>
+            </ul>
+        </li>
+    </tal:block>
+
+    <tal:block metal:fill-slot="content_body">
+        <div class="container-fluid">
+        <div class="row-fluid">    
+           
+        <div class="span9">    
+        <h2>Brief introduction</h2>
+        <p>
+        This project is a virtual battlefield for long standing battles of wits between artificial intelligences.
+        This project is also fills the void left behind
+        <a href="http://aichallenge.org/" title="The Google AI Challenge Home Page">The Google AI Challenge</a>.
+        There are few key differences between <em>The Google AI Challenge</em> and
+        <em>Rossum's Battle of Bits</em> (<em>RBoB</em>):
+        </p>
+
+        <ul>
+            <li> There are no restrictions on the language, libraries or techniques used in <em>RBoB</em>.
+            Instead of uploading your code on our server, your bot communicates with the server
+            via TCP connection.
+            </li>
+            <li> There are no deadlines in <em>RBoB</em>.
+            Instead of short term tournaments, there are longstanding ratings.
+            </li>
+        </ul>
+
+        <p>
+        The repertoire of games offered by <em>RBoB</em> is ever-expanding.
+        </p>
+
+        </div>
+        </div>
+        </div>
+    </tal:block>
+</metal:main>
+
